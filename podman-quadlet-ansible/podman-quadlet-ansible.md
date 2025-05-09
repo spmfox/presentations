@@ -71,6 +71,33 @@ Ansible’s main strengths are simplicity and ease of use. It also has a strong 
 - This can all be done **rootless**
 
 ---
+## Considerations for running Podman rootless
+There are other potential issues, depending on which distro you are using. In general its best to use a distro with recent versions of Podman, systemd, and the related tooling.
+
+The latest release of Fedora or CentOS Stream are a good starting point.
+
+###### https://github.com/containers/podman/blob/main/rootless.md
+
+---
+## Configuring the host
+What is the bare-minimum configuration needed on the host?
+- systemd:
+  - `loginctl enable-linger <rootles_containers_user>` 
+  - If this is not enabled, systemd will stop a user's processes when not logged in
+
+- sysctl:
+  - `net.ipv4.ip_unprivileged_port_start=<rootless_port_start>`
+  - If ports are needed, such as 80 or 22, sysctl needs to know that unprivileged users can use these ports
+
+---
+## Configuring the host
+![configure-host](gifs/configure-host.gif)
+
+---
+## Running your first rootless container
+
+
+---
 ## Getting started with Quadlet
 `wordpress.pod`
 

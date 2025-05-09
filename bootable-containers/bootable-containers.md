@@ -58,6 +58,7 @@ Some of the main commands:
     - This can cause "drift" where the built image expects something in `/etc`, perhaps a user, but the booted system does not have it defined
 
 ###### https://bootc-dev.github.io/bootc/filesystem.html
+###### https://lwn.net/Articles/1018082/
 
 ---
 ## What are the deployment methods?
@@ -225,7 +226,7 @@ Either the build is successful, and it is staged for the next reboot, or it fail
 ## How can this be automated?
 Ansible can be used to automate each step of this process:
 - Jinja templating for the containerfile, `bootc install` command, and custom systemd services for updating
-- Host configuration such as adding the proper ssh keys before deploy and creating the user and systemd jobs after deploy
+- Host configuration such as adding the proper SSH keys before deploy and creating the user and systemd jobs after deploy
 
 ###### https://github.com/spmfox/BootcBlade
 

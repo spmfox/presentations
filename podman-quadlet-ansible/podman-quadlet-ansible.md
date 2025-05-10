@@ -94,8 +94,64 @@ What is the bare-minimum configuration needed on the host?
 ![configure-host](gifs/configure-host.gif)
 
 ---
-## Running your first rootless container
+## Switching users
+The containers user should be as restricted as possible, and maybe even difficult to accidentally access (so you don't mess up production).
 
+In our example we will use the "containers" user that has no password (and no SSH key), but is accessed with the systemd command `machinectl`. This command is powerful and does many other things, but we are going to use it as a replacement for `sudo su`.
+
+When you `sudo su` into a user, it's not a full session so you cannot easily manipulate systemd user services.
+
+You can access the containers user like this: `sudo machinectl shell <user>@`
+
+---
+## Switching users
+![machinectl](gifs/machinectl.gif)
+
+---
+## Running containers with Podman
+There are multiple methods of running containers:
+- `run`
+- `compose`
+
+Most people have heard of Docker Compose, many projects have compose instructions. There are ways to get compose working with Podman however this will not easily work with Quadlet.
+
+We will be focusing on `podman run` (or `docker run`). If you have `podman run` instructions you'll be able to easily work with Quadlet.
+
+---
+## Running your first rootless container
+![rootless-container-run](gifs/rootless-container-run.gif)
+
+---
+## Creating Quadlet files
+To use Quadlet, you'll need the Quadlet files.
+
+You can use a tool called Podlet to assist with this process. Once you get the hang of it, they can be written manually.
+
+Using a `podman run` command you can generate a Quadlet file:
+
+`podlet podman run --rm -d --name wordpress-app docker.io/library/wordpress`
+
+Podlet can translate Compose files however your mileage may vary.
+
+###### https://github.com/containers/podlet
+
+---
+## Creating Quadlet files
+![podlet](gifs/podlet.gif)
+
+---
+## Creating Quadlet files
+Podlet is useful as a starting point, but there is no replacement for reading the manual itself and building your own.
+
+###### https://docs.podman.io/en/stable/markdown/podman-systemd.unit.5.html
+
+---
+## Getting started with Quadlet
+Quadlet files look and act mostly like systemd service files, but with Podman directives added.
+
+Because they are systemd service files, we can tell systemd to tie our services together as one logical unit.
+
+Here is an example of our WordPress with fully populated Quadlet files.
 
 ---
 ## Getting started with Quadlet
@@ -113,9 +169,9 @@ What is the bare-minimum configuration needed on the host?
     [Install]
     WantedBy=default.target
 
-- [Unit]: here we ask for other systemd services that should start, and what order to start them in
-- [Pod]: there is where the Podman configuration for the pod goes
-- [Install]: this allows `wordpress-pod.service` service to start automatically (if enabled)
+- [Unit]: we are asking for other systemd services that should start, and what order to start them in
+- [Pod]: Podman configuration for the pod goes
+- [Install]: allows `wordpress-pod.service` service to start automatically (if enabled)
 
 ---
 ## Getting started with Quadlet
@@ -134,8 +190,8 @@ What is the bare-minimum configuration needed on the host?
     Image=docker.io/library/wordpress:latest
     AutoUpdate=registry
 
-- [Unit]: here we ask for other systemd services that should start, and what order to start them in - we also tie this service to `wordpress-pod.service`
-- [Container]: this is the Podman configuration for the container - name, environment variables, image path are all defined here
+- [Unit]: we are asking for other systemd services that should start, and what order to start them in - we also tie this service to `wordpress-pod.service`
+- [Container]: Podman configuration for the container - name, environment variables, image path are all defined here
 
 ---
 ## Getting started with Quadlet
@@ -170,7 +226,7 @@ Once the files are in place, issue a `systemctl --user daemon-reload` to have sy
 ### Troubleshooting
 
 `/usr/lib/systemd/system-generators/podman-system-generator --user --dryrun`
-This command asks systemd to parse the Quadlet files, if it dumps a bunch of text with no errors then the parse was successful.
+This command asks systemd to parse the Quadlet files, when successful it will dump your Quadlets translated into systemd units. If it fails, there will be an error.
 
 ---
 ## Getting started with Quadlet
@@ -185,3 +241,12 @@ This also means once the files are removed from the directory, and the daemon is
 ---
 ## Quadlet in action
 ![quadlet-run](gifs/quadlet-run.gif)
+
+---
+## Where are the gaps?
+So far we saw how to manually run a container, how to generate a Quadlet file from a `podman run` command, we have tweaked our WordPress Quadlet files manually, and had them deployed as a pod.
+
+There are a few gaps however:
+- Containers were running rootless, however the user running the containers has passwordless sudo rights - user running the containers ideally should be our main user
+- We need to keep track of many Quadlet files, perhaps version control, and potentially moving them into and out of the systemd Quadlet folder
+

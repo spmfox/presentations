@@ -1,0 +1,12 @@
+[Unit]
+Wants=wordpress-pod.service wordpress-db.service
+After=wordpress-pod.service wordpress-db.service
+PartOf=wordpress-pod.service
+
+[Container]
+ContainerName=wordpress-app
+Pod=wordpress.pod
+Environment=WORDPRESS_DB_HOST=127.0.0.1 WORDPRESS_DB_USER=root WORDPRESS_DB_PASSWORD=wordpress
+Environment=WORDPRESS_DB_NAME=wordpress WORDPRESS_TABLE_PREFIX=wp_
+Image=docker.io/library/wordpress:latest
+AutoUpdate=registry

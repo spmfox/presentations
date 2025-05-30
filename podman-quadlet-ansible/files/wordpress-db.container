@@ -1,0 +1,12 @@
+[Unit]
+Wants=wordpress-pod.service
+After=wordpress-pod.service
+PartOf=wordpress-pod.service
+
+[Container]
+ContainerName=wordpress-db
+Pod=wordpress.pod
+Environment=MARIADB_DATABASE=wordpress
+Environment=MARIADB_ROOT_PASSWORD=wordpress
+Image=docker.io/library/mariadb:latest
+AutoUpdate=registry

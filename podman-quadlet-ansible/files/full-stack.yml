@@ -1,0 +1,49 @@
+all:
+  hosts:
+    containers-test:
+      ansible_host: "<HOSTNAME>"
+      ansible_user: "root"
+
+      host_patching: true
+      host_patching_reboot: "when-needed"
+
+      host_hostname: "containers-testing"
+
+      host_ssh_harden: true
+
+      host_timezone: "America/New_York"
+
+      host_firewall:
+        services:
+          - service: "http"
+            state: "enabled"
+
+          - service: "https"
+            state: "enabled"
+
+      host_packages:
+        - name: "git"
+          state: "present"
+
+      host_unprivileged_port_start: "80"
+
+      host_mounts:
+        - path: "/home/containers"
+          src: "/dev/disk/by-id/scsi-0Linode_Volume_containers-test"
+          fstype: "ext4"
+          opts: "defaults,noatime,nofail"
+          state: "mounted"
+
+      wordpress_quadlet_path: '/home/containers/quadlet'
+      containers_quadlets:
+        - name: 'wordpress-pod'
+          path: '{{ wordpress_quadlet_path }}'
+          file: 'wordpress.pod'
+
+        - name: 'wordpress-app'
+          path: '{{ wordpress_quadlet_path }}'
+          file: 'wordpress-app.container'
+
+        - name: 'wordpress-db'
+          path: '{{ wordpress_quadlet_path }}'
+          file: 'wordpress-db.container'

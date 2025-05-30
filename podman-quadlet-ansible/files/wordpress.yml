@@ -1,0 +1,15 @@
+all:
+  vars:
+    wordpress_quadlet_path: '/home/containers/quadlet'
+    containers_quadlets:
+      - name: 'wordpress-pod'
+        path: '{{ wordpress_quadlet_path }}'
+        file: 'wordpress.pod'
+
+      - name: 'wordpress-app'
+        path: '{{ wordpress_quadlet_path }}'
+        file: 'wordpress-app.container'
+
+      - name: 'wordpress-db'
+        path: '{{ wordpress_quadlet_path }}'
+        file: 'wordpress-db.container'

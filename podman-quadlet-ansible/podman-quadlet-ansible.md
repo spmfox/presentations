@@ -224,15 +224,14 @@ If the Quadlet files are removed and the systemd daemon is reloaded, the service
 
 ---
 ## How can this be automated?
-Ansible can automate every step of this process:
+### PodPlaybook - https://github.com/spmfox/PodPlaybook
+>  Ansible playbook for deploying and managing Podman containers.
 - Host configuration
   - Creating users and enabling use of privileged ports
   - Setting hostname, timezone, firewall rules, filesystem mounts, and more
 - Quadlet configuration
   - Managing many Quadlet files by placing them in the correct directory or removing them
   - Starting or stopping the related systemd services according to the inventory
-
-###### https://github.com/spmfox/PodPlaybook
 
 ---
 ## Automating the Container Deployment

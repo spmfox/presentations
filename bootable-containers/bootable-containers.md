@@ -263,12 +263,11 @@ If the build succeeds, it's staged for the next reboot. If it fails, nothing cha
 
 ---
 ## How can this be automated?
-Ansible can automate every step of this process:
+### BootcBlade - https://github.com/spmfox/BootcBlade
+> Ansible automation for deploying a KVM hypervisor using bootc on Fedora Server.
 - Use Jinja templating for the Containerfile, `bootc install` command, and custom systemd services for updating
 - Handle host configuration, like adding SSH keys before deployment
 - Automate post-deploy tasks, such as creating users and setting up systemd jobs
-
-###### https://github.com/spmfox/BootcBlade
 
 ---
 ## How can this be automated?

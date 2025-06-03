@@ -1,4 +1,13 @@
 # Presentations
+## About
+Here are various presentations I've given. Each one has files, GIFs, and source code available.
+
+If GIFs are used for a demo, the code used to generate the video will be under the `vhs` folder.
+
+Each time a presentation is spoken live, a branch will be created to capture the repo at that time.
+
+You can read the presentations as rendered markdown in this repo, or view the hosted HTML versions below.
+
 ## Hosted HTML versions of the presentations:
 
 ###### [bootable-containers](https://presentations.foxwd.com/bootable-containers/bootable-containers.html)

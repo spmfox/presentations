@@ -6,6 +6,8 @@
 
 ###### https://github.com/spmfox/presentations
 
+<!-- footer: v1.0 -->
+
 ---
 ## What are containers?
 Containers package applications together with everything they need to run, including their full runtime environment and required files.
@@ -13,6 +15,8 @@ Containers package applications together with everything they need to run, inclu
 This allows the application to work consistently when moved between different environments (development, testing, production, etc.), without losing any functionality.
 
 ###### https://www.redhat.com/en/topics/containers
+
+<!-- footer: "" -->
 
 ---
 ## What is Podman?

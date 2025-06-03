@@ -6,6 +6,8 @@
 
 ###### https://github.com/spmfox/presentations
 
+<!-- footer: v1.0 -->
+
 ---
 ## What are bootable containers?
 Bootable containers are basically container images that also include the kernel.
@@ -17,6 +19,8 @@ Once deployed, there is no container runtime. This lets you build full system im
 ![bootable-containers](images/bootable-container.png)
 
 ###### https://docs.fedoraproject.org/en-US/bootc/getting-started/
+
+<!-- footer: "" -->
 
 --- 
 ## What are bootable containers?

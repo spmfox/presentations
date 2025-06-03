@@ -1,3 +1,10 @@
+# Presentations
+## Hosted HTML versions of the presentations:
+
+###### [bootable-containers](https://presentations.foxwd.com/bootable-containers/bootable-containers.html)
+###### [podman-quadlet-ansible](https://presentations.foxwd.com/podman-quadlet-ansible/podman-quadlet-ansible.html)
+
+---
 Shield: [![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
 
 This work is licensed under a

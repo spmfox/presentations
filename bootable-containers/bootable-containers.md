@@ -1,3 +1,11 @@
+---
+title: Bootable Containers
+description: Build Your Own Immutable Distro
+author: Michael Fox
+keywords: bootc,container,immutable,ansible,bootcblade,linux,redhat
+url: https://github.com/spmfox/presentations
+---
+
 # Bootable Containers: 
 ## Build Your Own Immutable Distro
 

@@ -1,3 +1,11 @@
+---
+title: Podman + Quadlet + Ansible
+description: Rootless Service Management
+author: Michael Fox
+keywords: container,podman,quadlet,systemd,ansible,podplaybook,linux,redhat
+url: https://github.com/spmfox/presentations
+---
+
 # Podman + Quadlet + Ansible:
 ## Rootless Service Management
 

@@ -14,7 +14,7 @@ url: https://github.com/spmfox/presentations
 
 ###### https://github.com/spmfox/presentations
 
-<!-- footer: v1.0 -->
+<!-- footer: v1.1 -->
 
 ---
 ## What are bootable containers?
@@ -52,18 +52,7 @@ An immutable system keeps user data separate from system data. This allows the s
 > Transactional, in-place operating system updates using OCI/Docker container images. bootc is the key component in a broader mission of bootable containers.
 
 > The original Docker container model of using "layers" to model applications has been extremely successful. This project aims to apply the same technique for bootable host systems - using standard OCI/Docker containers as a transport and delivery format for base operating system updates.
-
 ###### https://bootc-dev.github.io/bootc/
-
----
-## Why use bootc over other immutable systems?
-- Simplify build process
-  - Reuse what you already know about building containers
-  - Take advantage of existing container build tools
-
-- Unify processes
-  - Build bare metal, VM, and container images using the same method and pipeline
-  - Scan OS images using container security tools
 
 ---
 ## FAQ
@@ -214,6 +203,16 @@ Rollbacks can be performed in two ways:
 Total time needed for a rollback to Fedora 41 was about **2 seconds** plus a reboot.
 
 ---
+## Why use bootc over other immutable systems?
+- Simplify build process
+  - Reuse what you already know about building containers
+  - Take advantage of existing container build tools
+
+- Unify processes
+  - Build bare metal, VM, and container images using the same method and pipeline
+  - Scan OS images using container security tools
+
+---
 ## What does this look like in production?
 Your Containerfiles can be as large or complex as needed. The following example is a Containerfile deployed with Ansible.
 
@@ -306,3 +305,24 @@ Presentation
 
 ###### Michael Fox
 ###### https://github.com/spmfox/presentations
+
+<script>
+let lastSlide = null;
+
+setInterval(() => {
+  const currentSlide = document.querySelector('.bespoke-marp-slide.bespoke-marp-active');
+  if (!currentSlide || currentSlide === lastSlide) return;
+  lastSlide = currentSlide;
+
+  const gifs = currentSlide.querySelectorAll('img[src*=".gif"]');
+  gifs.forEach(gif => {
+    const base = gif.src.split('?')[0];
+    const newSrc = `${base}?reload=${Date.now()}`;
+    const img = new Image();
+    img.onload = () => {
+      gif.src = newSrc;
+    };
+    img.src = newSrc;
+  });
+}, 300);
+</script>

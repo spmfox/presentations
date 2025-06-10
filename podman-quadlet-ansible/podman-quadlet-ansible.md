@@ -14,7 +14,7 @@ url: https://github.com/spmfox/presentations
 
 ###### https://github.com/spmfox/presentations
 
-<!-- footer: v1.0 -->
+<!-- footer: v1.1 -->
 
 ---
 ## What are containers?
@@ -133,8 +133,6 @@ Many projects provide Docker Compose files, and there are tools available to con
 Quadlet files are similar to systemd service files, but include additional Podman-specific directives.
 
 Each Quadlet becomes a systemd service once the files are parsed by systemd. 
-
-Here is an example of a WordPress environment using Quadlet files.
 
 ###### https://docs.podman.io/en/stable/markdown/podman-systemd.unit.5.html
 
@@ -304,6 +302,7 @@ This approach scales easily: large, complex environments can be defined in an An
 ---
 ## Links and Q&A
 - https://www.redhat.com/en/blog/quadlet-podman
+- https://docs.ansible.com/ansible/latest/getting_started/index.html
 - https://docs.podman.io/en/stable/markdown/podman-systemd.unit.5.html
 - https://github.com/containers/podman/blob/main/rootless.md
 
@@ -320,3 +319,24 @@ Presentation
 
 ###### Michael Fox
 ###### https://github.com/spmfox/presentations
+
+<script>
+let lastSlide = null;
+
+setInterval(() => {
+  const currentSlide = document.querySelector('.bespoke-marp-slide.bespoke-marp-active');
+  if (!currentSlide || currentSlide === lastSlide) return;
+  lastSlide = currentSlide;
+
+  const gifs = currentSlide.querySelectorAll('img[src*=".gif"]');
+  gifs.forEach(gif => {
+    const base = gif.src.split('?')[0];
+    const newSrc = `${base}?reload=${Date.now()}`;
+    const img = new Image();
+    img.onload = () => {
+      gif.src = newSrc;
+    };
+    img.src = newSrc;
+  });
+}, 300);
+</script>

@@ -320,6 +320,7 @@ Presentation
 ###### Michael Fox
 ###### https://github.com/spmfox/presentations
 
+<!--
 <script>
 let lastSlide = null;
 
@@ -340,3 +341,4 @@ setInterval(() => {
   });
 }, 300);
 </script>
+-->

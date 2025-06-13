@@ -13,8 +13,9 @@ url: https://github.com/spmfox/presentations
 ###### SouthEast LinuxFest 2025
 
 ###### https://github.com/spmfox/presentations
+###### https://presentations.foxwd.com
 
-<!-- footer: v1.1 -->
+<!-- footer: v1.2 -->
 
 ---
 ## What are containers?
@@ -319,6 +320,7 @@ Presentation
 
 ###### Michael Fox
 ###### https://github.com/spmfox/presentations
+###### https://presentations.foxwd.com
 
 <!--
 <script>

@@ -123,6 +123,8 @@ Let's see how a bootc container acts like a regular container.
 
 We will try to use `cowsay` on the host, where it's not installed, then we can try in the container with `podman run`.
 
+`sudo podman run --rm -it localhost/bootc-test sh -c 'cowsay -f tux bootc-test |lolcat`
+
 ---
 ## Running a bootc Container
 ![running bootc container](gifs/run.gif)

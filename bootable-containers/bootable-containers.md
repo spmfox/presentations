@@ -13,7 +13,7 @@ url: https://github.com/spmfox/presentations
 ###### SouthEast LinuxFest 2025
 
 ###### https://github.com/spmfox/presentations
-###### https://presentations.foxwd.com
+###### https://gitlab.com/spmfox/presentations
 
 <!-- footer: v1.2 -->
 
@@ -308,7 +308,7 @@ Presentation
 
 ###### Michael Fox
 ###### https://github.com/spmfox/presentations
-###### https://presentations.foxwd.com
+###### https://gitlab.com/spmfox/presentations
 
 <!--
 <script>

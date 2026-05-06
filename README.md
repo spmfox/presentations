@@ -6,13 +6,6 @@ If GIFs are used for a demo, the code used to generate the video will be under t
 
 Each time a presentation is spoken live, a branch will be created to capture the repo at that time.
 
-You can read the presentations as rendered markdown in this repo, or view the hosted HTML versions below.
-
-## Hosted HTML versions of the presentations:
-
-###### [bootable-containers](https://presentations.foxwd.com/bootable-containers/bootable-containers.html)
-###### [podman-quadlet-ansible](https://presentations.foxwd.com/podman-quadlet-ansible/podman-quadlet-ansible.html)
-
 ---
 Shield: [![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
 

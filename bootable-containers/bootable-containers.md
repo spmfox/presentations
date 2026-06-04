@@ -10,26 +10,31 @@ url: https://github.com/spmfox/presentations
 ## Build Your Own Immutable Distro
 
 ###### Michael Fox
-###### SouthEast LinuxFest 2025
+###### SouthEast LinuxFest 2026
 
 ###### https://github.com/spmfox/presentations
 ###### https://gitlab.com/spmfox/presentations
 
-<!-- footer: v1.2 -->
+<!-- footer: v1.3 -->
+
+---
+## Follow Along:
+
+![qr](images/qr-presentation-github.png)
+
+<!-- footer: "" -->
 
 ---
 ## What are bootable containers?
-Bootable containers are basically container images that also include the kernel.
+Bootable containers are container images that also include a kernel.
 
-They can be built, run, pushed, and pulled just like regular containers, with the added benefit of being deployable directly to a host.
+Using the `bootc` tool, these containers can be deployed to a host in the form of an immutable operating system.
 
-Once deployed, there is no container runtime. This lets you build full system images using container tools.
+These bootable containers can also be built, pushed, pulled, and run just like normal containers.
 
 ![bootable-containers](images/bootable-container.png)
 
 ###### https://docs.fedoraproject.org/en-US/bootc/getting-started/
-
-<!-- footer: "" -->
 
 --- 
 ## What are bootable containers?
@@ -37,255 +42,215 @@ Once deployed, there is no container runtime. This lets you build full system im
 ###### https://docs.fedoraproject.org/en-US/bootc/getting-started/
 
 ---
-## How does it work?
-When a bootable container is run, it behaves like a regular container. Once deployed to a host, it stops being a container and becomes an immutable system.
+## Why use bootable containers over other immutable systems?
+- Simplify OS build steps
+  - Reuse what you already know about building containers
+  - Take advantage of existing container build tools
 
-An immutable system keeps user data separate from system data. This allows the system to be updated or rolled back as a whole, while your data remains unchanged.
-
-`bootc` is the tool that enables all of this. After deployment, it uses rpm-ostree to manage the system's immutability.
-
-###### https://bootc-dev.github.io/bootc/man/bootc.html
-###### https://coreos.github.io/rpm-ostree/
+- Unify processes
+  - Build bare metal, VM, and container images using the same method and pipelines
+  - Scan OS images using container security tools
 
 ---
-## What is bootc?
-### `bootc`
-> Transactional, in-place operating system updates using OCI/Docker container images. bootc is the key component in a broader mission of bootable containers.
+## What is `bootc`?
+`bootc` is a tool for deploying and updating operating systems using container images.
 
-> The original Docker container model of using "layers" to model applications has been extremely successful. This project aims to apply the same technique for bootable host systems - using standard OCI/Docker containers as a transport and delivery format for base operating system updates.
+Instead of using containers only for applications, `bootc` extends the Docker/OCI model to whole operating systems. It delivers OS updates as standard container images, and applies them in place on a running system in a transactional way.
+
 ###### https://bootc-dev.github.io/bootc/
+###### https://bootc.dev/bootc/man/bootc.8.html
 
 ---
-## FAQ
-- Is my system a container now?
-  - No. After the image is deployed on a machine, there is no container runtime involved.
+## How does it work?
+When a bootable container is run, it behaves like a regular container. Once deployed to a host, it stops being a container and becomes an immutable system. **There is no container runtime after deployment to the host.**
 
-- Can the image be run as a normal container?
-  - Yes. But when run this way, it uses the host's kernel (like any regular container) and ignores the kernel inside the image.
+An immutable system keeps user data separate from system data. This allows the system to be updated or rolled back as a whole, while user data remains unchanged.
+
+After deployment, `bootc` uses `rpm-ostree` to manage the system's immutability.
 
 ###### https://bootc-dev.github.io/bootc/building/bootc-runtime.html
+###### https://coreos.github.io/rpm-ostree/
 
 ---
 ## Filesystem Layout
 During the container build, all files are writable, just like a normal container. After deployment, only the `/etc` and `/var` directories remain writable.
 
-The `/var` directory is writable and persistent. Its contents do not change with system updates.
+The `/var` directory is always writable and persistent, and the contents do not change with system updates.
+
+Once a file is changed or added in `/etc`, it stays persistent indefinitely. Otherwise, files in `/etc` will follow what is in the new system update.
 
 ###### https://bootc-dev.github.io/bootc/filesystem.html
-
----
-## Filesystem Layout
-Once a file is changed or added in `/etc`, it stays persistent indefinitely. Each update or rollback runs a three-way merge to combine changes from the current environment, the default environment, and the new deployment.
-
-This merge can sometimes cause drift. For example, the original image might expect a user defined in `/etc/passwd`, but the running system no longer has it.
-
 ###### https://ostreedev.github.io/ostree/atomic-upgrades/#assembling-a-new-deployment-directory
 ###### https://lwn.net/Articles/1018082/
 
 ---
 ## What are the deployment methods?
-- `bootc-install`
+- Internal installers
     - `bootc-install-to-disk`: Install to the target block device
     - `bootc-install-to-filesystem`: Install to an externally created filesystem structure
     - `bootc-install-to-existing-root`: Install to the host root filesystem
-- External Installers
+- External installers
+    - `bootc-image-builder`: Create disk images and ISO files
     - Anaconda
-    - `bootc-image-builder`
-###### https://docs.fedoraproject.org/en-US/bootc/provisioning-generic/
-###### https://docs.fedoraproject.org/en-US/bootc/bare-metal/
 
----
-## What are the deployment methods?
-`bootc-install` can deploy to a new disk or an existing filesystem. This allows you to take over an existing system by installing directly onto a running machine.
-
-`bootc-image-builder` can be used to create disk images and ISO files.
-###### https://bootc-dev.github.io/bootc/man/bootc-install.html
+###### https://bootc.dev/bootc/bootc-install.html
 ###### https://github.com/osbuild/bootc-image-builder
 
 ---
-## Building a bootc Container
-bootc containers can be built with Podman using regular Containerfiles:
+## What are the deployment methods?
+As we saw on the last slide, there are many different commands to run the install. The `bootc install` commands can be quite lengthy and hard to remember. Thankfully, there is also a user-friendly tool: `system-reinstall-bootc`.
 
-    FROM quay.io/fedora/fedora-bootc:41
-    RUN dnf -y install cowsay lolcat
+This tool is a wrapper for `bootc install to-existing root`. It will guide the user through selecting the container image and SSH keys.
 
-This is a very simple example which will use Fedora 41 as a base, and install the cowsay and lolcat packages.
+Once the installation is completed, the current system will be taken over and rebooted.
 
-`sudo podman build -t localhost/bootc-test -f bootc-test.containerfile`
-We will be building as root because bootc needs root access to deploy the container to the local host.
+https://bootc.dev/bootc/bootc-install.html#using-system-reinstall-bootc
 
 ---
-## Building a bootc Container
-![building bootc container](gifs/build.gif)
+## Building a Bootable Container
+Bootable containers can be built with Podman using regular Containerfiles:
+
+    FROM quay.io/fedora/fedora-bootc:43
+    RUN dnf -y install cbonsai
+
+This is a simple Containerfile using Fedora 43 as a base and installing `cbonsai`.
+
+`sudo podman build -t localhost/bootc-simple -f bootc-simple.containerfile`
+
+This Podman command will build the Containerfile as the root user, which will be needed if `bootc` will deploy this image later.
 
 ---
-## Running a bootc Container
-Let's see how a bootc container acts like a regular container.
-
-We will try to use `cowsay` on the host, where it's not installed, then we can try in the container with `podman run`.
-
-`sudo podman run --rm -it localhost/bootc-test sh -c 'cowsay -f tux bootc-test |lolcat`
+## Building a Bootable Container
+![bootc-build-simple](gifs/bootc-build-simple.gif)
 
 ---
-## Running a bootc Container
-![running bootc container](gifs/run.gif)
+## Building a Bootable Container
+Let's try an advanced multi-stage build:
+
+    FROM docker.io/library/ubuntu AS build
+    RUN apt-get update && apt-get install cbonsai
+
+    FROM quay.io/fedora/fedora-bootc:43
+    COPY --from=build /usr/games/cbonsai /usr/local/bin/cbonsai
+
+This time `cbonsai` will be installed from Ubuntu, then copied into the `bootc` container during the final stage.
+
+`sudo podman build -t localhost/bootc-multistage -f bootc-multistage.containerfile`
 
 ---
-## Deploying a bootc Image On Top of an Existing System
-A quick way to deploy a bootc image is on top of a running system.
-
-    podman run --rm --privileged \
-        --pid=host --security-opt label=type:unconfined_t \
-        --volume /dev:/dev \
-        --volume /var/lib/containers:/var/lib/containers \
-        --volume /:/target \
-        --entrypoint bootc \
-        localhost/bootc-test:latest \
-        install to-filesystem --skip-fetch-check --replace=alongside /target \
-	    --root-ssh-authorized-keys /target/root/.ssh/authorized_keys \
-        --target-transport=containers-storage --acknowledge-destructive
-
-Note that `bootc` is being used from *inside* the container that was built. This means that the container we built already has everything needed to deploy bootc.
+## Building a Bootable Container
+![bootc-build-multistage](gifs/bootc-build-multistage.gif)
 
 ---
-## Deploying a bootc Image On Top of an Existing System
-![deploying bootc image](gifs/deploy-1.gif)
+## Running a Bootable Container
+A bootable container can be run just like a normal container. In the last example, `cbonsai` was installed from Ubuntu and then transferred into the `bootc` image with a multi-stage build.
+
+The Fedora version of `cbonsai` does not support changing colors, but the Ubuntu one does. Let's run `cbonsai` with color-changing support:
+
+`sudo podman run --rm -it localhost/bootc-multistage cbonsai -l -p -b 0 -k 1,0,1,0 -L 20 -s 50`
 
 ---
-## Deploying a bootc Image On Top of an Existing System
-Once the installation is complete, simply reboot the host. When it comes back up, it will be running as a bootc immutable system.
-
-Now that the system has rebooted, let's check if `cowsay` works. It should, since we installed it in the image during the build process.
+## Running a Bootable Container
+![bootc-run.gif](gifs/bootc-run.gif)
 
 ---
-## Deploying a bootc Image On Top of an Existing System
-![deploying bootc image](gifs/deploy-2.gif)
+## Building in Production
+Now for a production example, here is a `bootc` Containerfile with ZFS support:
+
+    FROM quay.io/fedora/fedora-bootc:43
+    RUN dnf -y install https://zfsonlinux.org/fedora/zfs-release-3-0$(rpm --eval "%{dist}").noarch.rpm && \
+        dnf -y install kernel-devel-$(ls /usr/lib/modules) && \
+        dnf -y install zfs && \
+        dkms build zfs/$(rpm -q --qf '%{VERSION}' zfs) -k $(ls /usr/lib/modules) && \
+        dkms install zfs/$(rpm -q --qf '%{VERSION}' zfs) -k $(ls /usr/lib/modules) && \
+        systemctl disable dkms.service
+
+`sudo podman build -t localhost/bootc-zfs -f bootc-zfs.containerfile`
+
+This build took about 5 minutes in a VM with 2 Ryzen 7 5700U cores, 2GB RAM, and a cheap NVMe.
 
 ---
-## Updating a bootc System
-Updating is as simple as pulling a new image or building your own. Let's update our test environment to Fedora 42.
+## Deploying a Bootable Container
+One of the most interesting features of `bootc` is the ability to deploy an image *on top* of an existing host.
 
-    FROM quay.io/fedora/fedora-bootc:42
-    RUN dnf -y install cowsay lolcat
+Let's use the `system-reinstall-bootc` tool and our `bootc-zfs` image that was just built:
 
-`sudo podman build -t localhost/bootc-test -f bootc-test.containerfile`
-`sudo bootc update`
+`sudo system-reinstall-bootc localhost/bootc-zfs`
 
----
-## Updating a bootc System
-![updating bootc system](gifs/update.gif)
 
 ---
-## Updating a bootc System
-Total time needed to update our system from F41 -> F42 was **2 minutes 9 seconds**. Once rebooted, this system will be on Fedora 42.
+## Deploying a Bootable Container
+![deploy](gifs/deploy.gif)
+
+---
+## First Boot of Immutable System
+After the deployment and reboot, the system is now immutable and based on the `bootc-zfs` image.
+
+Let's check the status of `bootc` and see if `zfs` works.
+
+You might notice that the system is booted into `bootc-zfs-vhs`, this is an image based on `bootc-zfs` that has the `vhs` tool - which is needed to capture the output for this presentation.
+
+---
+## First Boot of Immutable System
+![first-boot](gifs/first-boot.gif)
 
 ---
 ## Temporarily Adding Packages
-You can temporarily make `/usr` writable and use `dnf` to install packages. These changes won't persist after a reboot, but they're useful for testing or making quick, temporary modifications.
+You can make `/usr` writable by running `bootc usr-overlay`. These changes won't persist after a reboot, but they're useful for testing or making temporary modifications.
 
-`bootc usr-overlay`
+Once the `/usr` overlay is applied, `dnf` can be used to add packages to the system.
+
+We are going to use this to install `vim` because it's missing from the standard Fedora install.
 
 ---
 ## Temporarily Adding Packages
 ![overlay](gifs/overlay.gif)
 
 ---
-## Rolling Back a bootc System
+## Switching Images
+Let's add the packages `vhs` and `vim` by creating an image based on `bootc-zfs`:
+
+    FROM localhost/bootc-zfs
+    RUN dnf -y install vim vhs
+
+Then we can update our system to this new image, which will be effective after a reboot.
+
+`sudo podman build -t localhost/bootc-zfs-tools -f bootc-zfs-tools.containerfile`
+
+`sudo bootc switch --transport containers-storage localhost/bootc-zfs-tools`
+
+---
+## Switching Images
+![switching-images](gifs/switching-images.gif)
+
+---
+## Rolling Back a `bootc` System
 Rollbacks can be performed in two ways:
 - From the GRUB menu during boot
-- Directly from the running system
+- Command line from the running system
 
 `bootc rollback`
 
 ---
-## Rolling Back a bootc System
-![rolling back bootc system](gifs/rollback.gif)
+## Overview and Next Steps
+We built a Fedora 43 immutable operating system with ZFS baked into the image.
+
+If the ZFS build fails, the image will not be created and the system will not update or switch into a broken state.
+
+Local builds can be automated via a systemd service. The image can be built automatically and deployed in the background. The system would be updated on the next reboot.
 
 ---
-## Rolling Back a bootc System
-Total time needed for a rollback to Fedora 41 was about **2 seconds** plus a reboot.
-
----
-## Why use bootc over other immutable systems?
-- Simplify build process
-  - Reuse what you already know about building containers
-  - Take advantage of existing container build tools
-
-- Unify processes
-  - Build bare metal, VM, and container images using the same method and pipeline
-  - Scan OS images using container security tools
-
----
-## What does this look like in production?
-Your Containerfiles can be as large or complex as needed. The following example is a Containerfile deployed with Ansible.
-
-It does several things, including:
-- Starts from a Fedora base image
-- Installs tools like smartmontools, hdparm, and wireguard-tools
-- Configures firewalld
-- Installs ZFS, including the Cockpit plugin and Sanoid/Syncoid
-- Sets up KVM
-- Installs NFS and Samba
-
-###### https://github.com/spmfox/BootcBlade/blob/main/templates/bootcblade.containerfile.j2
-
----
-## What does this look like in production?
-![bootcblade-code](gifs/bootcblade-code.gif)
-
----
-## What does this look like in production?
-Updates are handled via a systemd service:
-
-    [Unit]
-    After=network-online.target
-    Wants=network-online.target
-    Description=BootcBlade rebuild service
-
-    [Service]
-    Type=oneshot
-    TimeoutStartSec=30m
-    ExecStart=/usr/bin/bash -c "podman build -t localhost/bootcblade \
-      -f /root/bootcblade.containerfile --pull=always"
-    ExecStartPost=/usr/bin/bash -c "bootc switch --transport containers-storage \
-      localhost/bootcblade:latest && bootc update"
-    ExecStartPost=-sleep 10 ; podman image prune -f
-
-###### https://github.com/spmfox/BootcBlade/blob/main/templates/bootcblade-rebuild.service.j2
-
----
-## What does this look like in production?
-And scheduled via a systemd timer:
-
-    [Unit]
-    Description=bootcblade-rebuild timer
-
-    [Timer]
-    OnCalendar=weekly
-    Persistent=true
-
-    [Install]
-    WantedBy=timers.target
-
-###### https://github.com/spmfox/BootcBlade/blob/main/templates/bootcblade-rebuild.timer.j2
-
----
-## What does this look like in production?
-With bootc, installing ZFS kernel modules via DKMS is now risk-free. There's no chance of a broken system due to failed module builds.
-
-If the build succeeds, it's staged for the next reboot. If it fails, nothing changes and the current system keeps running safely.
-
----
-## How can this be automated?
-### BootcBlade - https://github.com/spmfox/BootcBlade
-> Ansible automation for deploying a KVM hypervisor using bootc on Fedora Server.
-- Use Jinja templating for the Containerfile, `bootc install` command, and custom systemd services for updating
-- Handle host configuration, like adding SSH keys before deployment
-- Automate post-deploy tasks, such as creating users and setting up systemd jobs
-
----
-## How can this be automated?
-![bootcblade-deploy](gifs/bootcblade-deploy.gif)
+## More Examples
+- BootcBlade
+  - My project, runs my servers at home
+  - Fedora + ZFS & KVM & NFS & Samba & Cockpit & Sanoid+Syncoid
+  - https://github.com/spmfox/BootcBlade
+  - https://github.com/spmfox/BootcBlade/blob/main/docs/bootcblade.containerfile
+- Bazzite
+  - Based on Fedora, focuses on gaming and everyday use
+  - https://github.com/ublue-os/bazzite
+- Red Hat Image Mode
+  - https://developers.redhat.com/products/rhel/image-mode
 
 ---
 ## Links and Q&A
@@ -299,16 +264,15 @@ Presentation
 - https://github.com/marp-team/marp-cli
 - https://github.com/charmbracelet/vhs
 
-###### https://github.com/spmfox/BootcBlade
-
 ---
-# Thank you
-### Bootable Containers: 
-#### Build Your Own Immutable Distro
+# Thank you!
+### Bootable Containers: Build Your Own Immutable Distro
 
 ###### Michael Fox
 ###### https://github.com/spmfox/presentations
 ###### https://gitlab.com/spmfox/presentations
+
+[To render HTML version, uncomment the following script and run marp with --html]::
 
 <!--
 <script>
